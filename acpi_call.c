@@ -5,7 +5,14 @@
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <contrib/dev/acpica/include/acpi.h>
+#include <dev/acpica/acpiio.h>
 #include "acpi_call_io.h"
+
+static int
+acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
+{
+	return 0;
+}
 
 static int
 acpi_call_loader(struct module *m, int what, void *arg)
@@ -14,10 +21,10 @@ acpi_call_loader(struct module *m, int what, void *arg)
         
      	switch (what) {
 	case MOD_LOAD:
-		uprintf("acpi_call module loaded.\n");
+		err = acpi_register_ioctl(ACPIIO_CALL, acpi_call_ioctl, NULL);
 		break;
 	case MOD_UNLOAD:
-		uprintf("acpi_call module unloaded.\n");
+		acpi_deregister_ioctl(ACPIIO_CALL, acpi_call_ioctl);
 		break;
 	default:
 		err = EOPNOTSUPP;
