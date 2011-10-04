@@ -7,8 +7,7 @@
 struct acpi_call_descr
 {
 	char		*path;
-	uint8_t		argc;
-	ACPI_OBJECT	*argv;
+	ACPI_OBJECT_LIST	args;
 };
 
 #define ACPIIO_CALL	_IOWR('X', 0x01, caddr_t)
