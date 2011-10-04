@@ -11,7 +11,14 @@
 static int
 acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
 {
-	return 0;
+	int err;
+	struct acpi_call_descr *params;
+
+	err = 0;
+	params = (struct acpi_call_descr*)addr;
+	AcpiEvaluateObject(NULL, params->path, &params->args, NULL);
+
+	return (err);
 }
 
 static int
