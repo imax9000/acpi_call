@@ -5,6 +5,7 @@
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <contrib/dev/acpica/include/acpi.h>
+#include "acpi_call_io.h"
 
 static int
 acpi_call_loader(struct module *m, int what, void *arg)
