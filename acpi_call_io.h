@@ -11,6 +11,6 @@ struct acpi_call_descr
 	ACPI_OBJECT	*argv;
 };
 
-#define ACPIIO_CALL	_IOWR('X', 0x01, struct acpi_call_descr*)
+#define ACPIIO_CALL	_IOWR('X', 0x01, caddr_t)
 
 #endif // ACPI_CALL_IO_H
