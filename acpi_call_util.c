@@ -35,6 +35,13 @@ int main(int argc, char * argv[])
 	verbose = 0;
 	
 	parse_opts(argc, argv);
+
+	if (method_path[0] == 0)
+	{
+		fprintf(stderr, "Please specify path to method with -p flag\n");
+		return 1;
+	}
+
 	if (verbose)
 		print_params(&params);
 
