@@ -15,8 +15,10 @@ acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
 	struct acpi_call_descr *params;
 
 	err = 0;
-	params = (struct acpi_call_descr*)addr;
-	AcpiEvaluateObject(NULL, params->path, &params->args, NULL);
+	if (cmd == ACPIIO_CALL) {
+		params = (struct acpi_call_descr*)addr;
+		AcpiEvaluateObject(NULL, params->path, &params->args, NULL);
+	}
 
 	return (err);
 }
@@ -26,7 +28,7 @@ acpi_call_loader(struct module *m, int what, void *arg)
 {
 	int err = 0;
         
-     	switch (what) {
+   	switch (what) {
 	case MOD_LOAD:
 		err = acpi_register_ioctl(ACPIIO_CALL, acpi_call_ioctl, NULL);
 		break;
