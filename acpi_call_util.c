@@ -13,6 +13,8 @@
 
 char dev_path[MAXPATHLEN] = "/dev/acpi";
 char method_path[MAX_ACPI_PATH] = "";
+size_t result_buf_size = 1024;
+char output_format = 'b';
 
 int verbose;
 
@@ -23,11 +25,14 @@ void parse_opts(int, char *[]);
 void show_help(FILE*);
 int parse_buffer(ACPI_OBJECT*, char*);
 void print_params(struct acpi_call_descr*);
+void print_acpi_object(ACPI_OBJECT*);
+void print_acpi_buffer(ACPI_BUFFER*, char);
 
 int main(int argc, char * argv[])
 {
 	int fd;
 
+	bzero(&params, sizeof(params));
 	params.path = method_path;
 	params.args.Count = 0;
 	params.args.Pointer = args;
@@ -35,6 +40,15 @@ int main(int argc, char * argv[])
 	verbose = 0;
 	
 	parse_opts(argc, argv);
+
+	params.result.Length = result_buf_size;
+	params.result.Pointer = malloc(result_buf_size);
+
+	if (params.result.Pointer == NULL)
+	{
+		perror("malloc");
+		return 1;
+	}
 
 	if (method_path[0] == 0)
 	{
@@ -57,7 +71,12 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 
-	return 0;
+	if (verbose)
+		printf("Status: %d\nResult: ", params.retval);
+	print_acpi_buffer(&params.result, output_format);
+	printf("\n");
+
+	return params.retval;
 }
 
 void parse_opts(int argc, char * argv[])
@@ -65,7 +84,7 @@ void parse_opts(int argc, char * argv[])
 	char c;
 	int i;
 
-	while ((c = getopt(argc, argv, "hvd:p:i:s:b:")) != -1)
+	while ((c = getopt(argc, argv, "hvd:p:i:s:b:o:")) != -1)
 	{
 		switch(c)
 		{
@@ -112,6 +131,19 @@ void parse_opts(int argc, char * argv[])
 			}
 			params.args.Count++;
 			break;
+		case 'o':
+			output_format = optarg[0];
+			switch (optarg[0])
+			{
+			case 'i':
+			case 's':
+			case 'b':
+				break;
+			default:
+				fprintf(stderr, "Incorrect output format: %c", optarg[0]);
+				show_help(stderr);
+				exit(1);
+			}
 		default:
 			show_help(stderr);
 			exit(1);
@@ -129,6 +161,7 @@ void show_help(FILE* f)
 	fprintf(f, "  -i number       - add integer argument\n");
 	fprintf(f, "  -s string       - add string argument\n");
 	fprintf(f, "  -b hexstring    - add buffer argument\n");
+	fprintf(f, "  -o i|s|b        - print result as integer|string|hexstring\n");
 }
 
 int parse_buffer(ACPI_OBJECT *dst, char *src)
@@ -166,21 +199,60 @@ void print_params(struct acpi_call_descr* p)
 		{
 		case ACPI_TYPE_INTEGER:
 			printf("Argument %d type: Integer\n", i+1);
-			printf("Argument %d value: %d\n", i+1, p->args.Pointer[i].Integer.Value);
 			break;
 		case ACPI_TYPE_STRING:
 			printf("Argument %d type: String\n", i+1);
-			printf("Argument %d value: %s\n", i+1, p->args.Pointer[i].String.Pointer);
 			break;
 		case ACPI_TYPE_BUFFER:
 			printf("Argument %d type: Buffer\n", i+1);
-			printf("Argument %d value: ", i+1);
-			for(j = 0; j < p->args.Pointer[i].Buffer.Length; j++)
-			{
-				printf("%X", p->args.Pointer[i].Buffer.Pointer[j]);
-			}
-			printf("\n");
 			break;
 		}
+		printf("Argument %d value: ", i+1);
+		print_acpi_object(&(p->args.Pointer[i]));
+		printf("\n");
+	}
+}
+
+void print_acpi_object(ACPI_OBJECT* obj)
+{
+	int i;
+
+	switch (obj->Type)
+	{
+	case ACPI_TYPE_INTEGER:
+		printf("%llu", obj->Integer.Value);
+		break;
+	case ACPI_TYPE_STRING:
+		printf("%s", obj->String.Pointer);
+		break;
+	case ACPI_TYPE_BUFFER:
+		for(i = 0; i < obj->Buffer.Length; i++)
+		{
+			printf("%X", obj->Buffer.Pointer[i]);
+		}
+		break;
+	default:
+		printf("Unknown object type '%d'", obj->Type);
+	}	
+}
+
+void print_acpi_buffer(ACPI_BUFFER* buf, char format)
+{
+	int i;
+
+	switch (format)
+	{
+	case 'i':
+		printf("%llu", *((ACPI_INTEGER*)(buf->Pointer)));
+		break;
+	case 's':
+		printf("%s", buf->Pointer);
+		break;
+	case 'b':
+		for(i = 0; i < buf->Length; i++)
+		{
+			printf("%X", ((UINT8*)(buf->Pointer))[i]);
+		}
+		break;
 	}
 }

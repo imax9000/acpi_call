@@ -8,6 +8,9 @@ struct acpi_call_descr
 {
 	char		*path;
 	ACPI_OBJECT_LIST	args;
+	ACPI_STATUS	retval;
+	ACPI_BUFFER	result;
+	ACPI_SIZE	reslen;	/* Actual length of data returned by AcpiEvaluateObject */
 };
 
 #define ACPIIO_CALL	_IOWR('X', 0x01, caddr_t)

@@ -11,16 +11,32 @@
 static int
 acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
 {
-	int err;
 	struct acpi_call_descr *params;
+	ACPI_BUFFER	result;
 
-	err = 0;
+	result.Length = ACPI_ALLOCATE_BUFFER;
+	result.Pointer = NULL;
+
 	if (cmd == ACPIIO_CALL) {
 		params = (struct acpi_call_descr*)addr;
-		AcpiEvaluateObject(NULL, params->path, &params->args, NULL);
+		params->retval = AcpiEvaluateObject(NULL, params->path, &params->args, &result);
+		if (ACPI_SUCCESS(params->retval))
+		{
+			if (result.Pointer != NULL)
+			{
+				if (params->result.Pointer != NULL)
+				{	
+					params->result.Length = min(params->result.Length, result.Length);
+					copyout(result.Pointer, params->result.Pointer,
+							params->result.Length);
+					params->reslen = result.Length;
+				}
+				AcpiOsFree(result.Pointer);
+			}
+		}
 	}
 
-	return (err);
+	return (0);
 }
 
 static int
