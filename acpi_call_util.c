@@ -138,6 +138,7 @@ void parse_opts(int argc, char * argv[])
 			case 'i':
 			case 's':
 			case 'b':
+			case 'o':
 				break;
 			default:
 				fprintf(stderr, "Incorrect output format: %c\n", optarg[0]);
@@ -162,7 +163,7 @@ void show_help(FILE* f)
 	fprintf(f, "  -i number       - add integer argument\n");
 	fprintf(f, "  -s string       - add string argument\n");
 	fprintf(f, "  -b hexstring    - add buffer argument\n");
-	fprintf(f, "  -o i|s|b        - print result as integer|string|hexstring\n");
+	fprintf(f, "  -o i|s|b|o      - print result as integer|string|hexstring|object\n");
 }
 
 int parse_buffer(ACPI_OBJECT *dst, char *src)
@@ -254,6 +255,9 @@ void print_acpi_buffer(ACPI_BUFFER* buf, char format)
 		{
 			printf("%02X", ((UINT8*)(buf->Pointer))[i]);
 		}
+		break;
+	case 'o':
+		print_acpi_object((ACPI_OBJECT*)(buf->Pointer));
 		break;
 	}
 }
