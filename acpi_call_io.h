@@ -13,6 +13,6 @@ struct acpi_call_descr
 	ACPI_SIZE	reslen;	/* Actual length of data returned by AcpiEvaluateObject */
 };
 
-#define ACPIIO_CALL	_IOWR('X', 0x01, caddr_t)
+#define ACPIIO_CALL	_IOWR('X', 0x01, struct acpi_call_descr)
 
 #endif // ACPI_CALL_IO_H
