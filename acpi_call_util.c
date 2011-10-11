@@ -228,7 +228,7 @@ void print_acpi_object(ACPI_OBJECT* obj)
 	case ACPI_TYPE_BUFFER:
 		for(i = 0; i < obj->Buffer.Length; i++)
 		{
-			printf("%X", obj->Buffer.Pointer[i]);
+			printf("%02X", obj->Buffer.Pointer[i]);
 		}
 		break;
 	default:
@@ -251,7 +251,7 @@ void print_acpi_buffer(ACPI_BUFFER* buf, char format)
 	case 'b':
 		for(i = 0; i < buf->Length; i++)
 		{
-			printf("%X", ((UINT8*)(buf->Pointer))[i]);
+			printf("%02X", ((UINT8*)(buf->Pointer))[i]);
 		}
 		break;
 	}
