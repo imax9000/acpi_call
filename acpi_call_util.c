@@ -140,10 +140,11 @@ void parse_opts(int argc, char * argv[])
 			case 'b':
 				break;
 			default:
-				fprintf(stderr, "Incorrect output format: %c", optarg[0]);
+				fprintf(stderr, "Incorrect output format: %c\n", optarg[0]);
 				show_help(stderr);
 				exit(1);
 			}
+			break;
 		default:
 			show_help(stderr);
 			exit(1);
