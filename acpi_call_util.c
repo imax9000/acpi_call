@@ -14,7 +14,7 @@
 char dev_path[MAXPATHLEN] = "/dev/acpi";
 char method_path[MAX_ACPI_PATH] = "";
 size_t result_buf_size = 1024;
-char output_format = 'b';
+char output_format = 'o';
 
 int verbose;
 
