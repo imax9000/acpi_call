@@ -8,6 +8,9 @@
 #include <dev/acpica/acpiio.h>
 #include "acpi_call_io.h"
 
+
+void acpi_call_fixup_pointers(ACPI_OBJECT *p, UINT8 *orig);
+
 static int
 acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
 {
@@ -30,6 +33,8 @@ acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
 					copyout(result.Pointer, params->result.Pointer,
 							params->result.Length);
 					params->reslen = result.Length;
+					if (result.Length >= sizeof(ACPI_OBJECT))
+						acpi_call_fixup_pointers((ACPI_OBJECT*)(params->result.Pointer), result.Pointer);
 				}
 				AcpiOsFree(result.Pointer);
 			}
@@ -37,6 +42,20 @@ acpi_call_ioctl(u_long cmd, caddr_t addr, void *arg)
 	}
 
 	return (0);
+}
+
+void
+acpi_call_fixup_pointers(ACPI_OBJECT *p, UINT8 *orig)
+{
+	switch (p->Type)
+	{
+	case ACPI_TYPE_STRING:
+		p->String.Pointer = (char*)((UINT8*)(p->String.Pointer) - orig + (UINT8*)p);
+		break;
+	case ACPI_TYPE_BUFFER:
+		p->Buffer.Pointer -= orig - (UINT8*)p;
+		break;
+	}
 }
 
 static int
