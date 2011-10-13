@@ -84,3 +84,4 @@ static moduledata_t acpi_call_mod = {
 };  
 
 DECLARE_MODULE(acpi_call, acpi_call_mod, SI_SUB_KLD, SI_ORDER_ANY);
+MODULE_DEPEND(acpi_call, acpi, 1, 1, 1);
