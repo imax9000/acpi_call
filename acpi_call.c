@@ -113,5 +113,5 @@ static moduledata_t acpi_call_mod = {
 	NULL
 };  
 
-DECLARE_MODULE(acpi_call, acpi_call_mod, SI_SUB_KLD, SI_ORDER_ANY);
+DECLARE_MODULE(acpi_call, acpi_call_mod, SI_SUB_EXEC, SI_ORDER_ANY);
 MODULE_DEPEND(acpi_call, acpi, 1, 1, 1);
