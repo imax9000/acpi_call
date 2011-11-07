@@ -32,7 +32,11 @@
 #define ACPI_CALL_IO_H
 
 #include <sys/ioccom.h>
-#include <contrib/dev/acpica/include/actypes.h>
+#if __FreeBSD__ >= 8
+#	include <contrib/dev/acpica/include/actypes.h>
+#else
+#	include <contrib/dev/acpica/actypes.h>
+#endif
 
 struct acpi_call_descr
 {

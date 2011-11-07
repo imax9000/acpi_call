@@ -28,7 +28,11 @@
  *
  */
 
-#include <contrib/dev/acpica/include/acpi.h>
+#if __FreeBSD__ >= 8
+#	include <contrib/dev/acpica/include/acpi.h>
+#else
+#	include <contrib/dev/acpica/acpi.h>
+#endif
 #include "acpi_call_io.h"
 #include <fcntl.h>
 #include <sys/ioctl.h>
